@@ -6,9 +6,14 @@ vmod_LTLIBRARIES = libvmod_example.la
 libvmod_example_la_SOURCES = \
 	vmod_example.c
 
+libvmod_example_la_LIBADD = -L$(abs_top_builddir)/ -lhelpers
 nodist_libvmod_example_la_SOURCES = \
+	../vmod-go-helper.h \
 	vcc_example_if.c \
 	vcc_example_if.h
+
+../vmod-go-helper.h: ../helpers.go
+	cd ..; go build -buildmode=c-shared -o libhelpers.so
 
 dist_man_MANS = vmod_example.3
 
@@ -16,7 +21,7 @@ dist_man_MANS = vmod_example.3
 
 AM_TESTS_ENVIRONMENT = \
 	PATH="$(VMOD_TEST_PATH)" \
-	LD_LIBRARY_PATH="$(VARNISH_LIBRARY_PATH)"
+	LD_LIBRARY_PATH="$(VARNISH_LIBRARY_PATH):$(abs_top_builddir)"
 TEST_EXTENSIONS = .vtc
 VTC_LOG_COMPILER = varnishtest -v
 AM_VTC_LOG_FLAGS = -Dvmod_example="$(VMOD_EXAMPLE)"

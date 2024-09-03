@@ -8,6 +8,7 @@
 #include "vtim.h"
 #include "vcc_example_if.h"
 
+#include "../libhelpers.h"
 const size_t infosz = 64;
 char	     *info;
 
@@ -67,18 +68,9 @@ VCL_STRING
 vmod_hello(VRT_CTX, VCL_STRING name)
 {
 	char *p;
-	unsigned u, v;
 
-	u = WS_ReserveAll(ctx->ws); /* Reserve some work space */
-	p = ctx->ws->f;		/* Front of workspace area */
-	v = snprintf(p, u, "Hello, %s", name);
-	v++;
-	if (v > u) {
-		/* No space, reset and leave */
-		WS_Release(ctx->ws, 0);
-		return (NULL);
-	}
-	/* Update work space with what we've used */
-	WS_Release(ctx->ws, v);
+	char *pgo = Go_hello(TRUST_ME(name));
+	p = WS_Copy(ctx->ws, pgo, -1);
+	free(pgo);
 	return (p);
 }
